@@ -7,7 +7,7 @@ def main():
 # model = YOLO("d:/Data/yolov8s.pt")  # load a pretrained model (recommended for training)
 
         # Train the model
-    results = model.train(data="dataset/blood.yaml", batch=8,epochs=300, imgsz=640)
+    results = model.train(data="/kaggle/working/luna16.yaml", batch=8,epochs=4, imgsz=640)
 
 if __name__=='__main__':
     multiprocessing.freeze_support()
