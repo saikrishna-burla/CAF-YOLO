@@ -3,7 +3,7 @@ import multiprocessing
 
 # yaml会自动下载
 def main():
-    model = YOLO("E:/ultralytics-main/ultralytics/cfg/models/v8/yolov8-CAFMAttention.yaml")  # build a new model from scratch
+    model = YOLO("/kaggle/working/CAF-YOLO/ultralytics/cfg/models/v8/yolov8-CAFMAttention.yaml")  # build a new model from scratch
 # model = YOLO("d:/Data/yolov8s.pt")  # load a pretrained model (recommended for training)
 
         # Train the model
