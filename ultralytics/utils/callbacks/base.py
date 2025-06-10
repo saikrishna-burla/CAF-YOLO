@@ -199,18 +199,48 @@ def add_integration_callbacks(instance):
     from .hub import callbacks as hub_cb
     callbacks_list = [hub_cb]
 
-    # Load training callbacks
+    # Load training callbacks if instance is a Trainer
     if 'Trainer' in instance.__class__.__name__:
-        from .clearml import callbacks as clear_cb
-        from .comet import callbacks as comet_cb
-        from .dvc import callbacks as dvc_cb
-        #from .mlflow import callbacks as mlflow_cb
-        # from .neptune import callbacks as neptune_cb
-        #from .wb import callbacks as wb_cb
-        callbacks_list.extend([clear_cb, comet_cb, dvc_cb])
+        try:
+            from .clearml import callbacks as clear_cb
+            callbacks_list.append(clear_cb)
+        except ImportError:
+            pass
 
-    # Add the callbacks to the callbacks dictionary
+        try:
+            from .comet import callbacks as comet_cb
+            callbacks_list.append(comet_cb)
+        except ImportError:
+            pass
+
+        try:
+            from .dvc import callbacks as dvc_cb
+            callbacks_list.append(dvc_cb)
+        except ImportError:
+            pass
+
+        # Optionally enable these if you install and use them:
+        # try:
+        #     from .mlflow import callbacks as mlflow_cb
+        #     callbacks_list.append(mlflow_cb)
+        # except ImportError:
+        #     pass
+
+        # try:
+        #     from .wb import callbacks as wb_cb
+        #     callbacks_list.append(wb_cb)
+        # except ImportError:
+        #     pass
+
+        # try:
+        #     from .raytune import callbacks as tune_cb
+        #     callbacks_list.append(tune_cb)
+        # except ImportError:
+        #     pass
+
+    # Add callbacks safely
     for callbacks in callbacks_list:
         for k, v in callbacks.items():
             if v not in instance.callbacks[k]:
                 instance.callbacks[k].append(v)
+
