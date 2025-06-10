@@ -1,0 +1,9 @@
+train: E:/yolov8-pytorch-master/dataset/train.txt
+val: E:/yolov8-pytorch-master/dataset/val.txt
+test: E:/yolov8-pytorch-master/dataset/test.txt
+
+# number of classes
+nc: 3
+
+# class names
+names: ['WBC', 'RBC', 'Platelets']

@@ -545,43 +545,35 @@ def temporary_modules(modules=None):
 
 
 def torch_safe_load(weight):
-    """
-    This function attempts to load a PyTorch model with the torch.load() function. If a ModuleNotFoundError is raised,
-    it catches the error, logs a warning message, and attempts to install the missing module via the
-    check_requirements() function. After installation, the function again attempts to load the model using torch.load().
-
-    Args:
-        weight (str): The file path of the PyTorch model.
-
-    Returns:
-        (dict): The loaded PyTorch model.
+    def torch_safe_load(weight):
+     """
+    Securely loads a PyTorch model, allowing trusted classes like DetectionModel.
     """
     from ultralytics.utils.downloads import attempt_download_asset
+    from ultralytics.nn.tasks import DetectionModel  # import the model class
+    import torch.serialization
 
     check_suffix(file=weight, suffix='.pt')
     file = attempt_download_asset(weight)  # search online if missing locally
+
     try:
         with temporary_modules({
                 'ultralytics.yolo.utils': 'ultralytics.utils',
                 'ultralytics.yolo.v8': 'ultralytics.models.yolo',
-                'ultralytics.yolo.data': 'ultralytics.data'}):  # for legacy 8.0 Classify and Pose models
-            return torch.load(file, map_location='cpu'), file  # load
+                'ultralytics.yolo.data': 'ultralytics.data'}), \
+             torch.serialization.safe_globals([DetectionModel]):
+            return torch.load(file, map_location='cpu', weights_only=False), file  # allow full load
 
-    except ModuleNotFoundError as e:  # e.name is missing module name
+    except ModuleNotFoundError as e:
         if e.name == 'models':
             raise TypeError(
-                emojis(f'ERROR ❌️ {weight} appears to be an Ultralytics YOLOv5 model originally trained '
-                       f'with https://github.com/ultralytics/yolov5.\nThis model is NOT forwards compatible with '
-                       f'YOLOv8 at https://github.com/ultralytics/ultralytics.'
-                       f"\nRecommend fixes are to train a new model using the latest 'ultralytics' package or to "
-                       f"run a command with an official YOLOv8 model, i.e. 'yolo predict model=yolov8n.pt'")) from e
-        LOGGER.warning(f"WARNING ⚠️ {weight} appears to require '{e.name}', which is not in ultralytics requirements."
-                       f"\nAutoInstall will run now for '{e.name}' but this feature will be removed in the future."
-                       f"\nRecommend fixes are to train a new model using the latest 'ultralytics' package or to "
-                       f"run a command with an official YOLOv8 model, i.e. 'yolo predict model=yolov8n.pt'")
-        check_requirements(e.name)  # install missing module
+                emojis(f'ERROR ❌️ {weight} appears to be a YOLOv5 model not compatible with YOLOv8.\n'
+                       f'Retrain using the latest Ultralytics package.')) from e
+        LOGGER.warning(f"WARNING ⚠️ {weight} requires missing module '{e.name}'. Auto-installing...")
+        check_requirements(e.name)
+        with torch.serialization.safe_globals([DetectionModel]):
+            return torch.load(file, map_location='cpu', weights_only=False), file
 
-        return torch.load(file, map_location='cpu'), file  # load
 
 
 def attempt_load_weights(weights, device=None, inplace=True, fuse=False):

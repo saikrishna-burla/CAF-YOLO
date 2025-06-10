@@ -205,11 +205,9 @@ def add_integration_callbacks(instance):
         from .comet import callbacks as comet_cb
         from .dvc import callbacks as dvc_cb
         from .mlflow import callbacks as mlflow_cb
-        from .neptune import callbacks as neptune_cb
-        from .raytune import callbacks as tune_cb
-        from .tensorboard import callbacks as tb_cb
+        # from .neptune import callbacks as neptune_cb
         from .wb import callbacks as wb_cb
-        callbacks_list.extend([clear_cb, comet_cb, dvc_cb, mlflow_cb, neptune_cb, tune_cb, tb_cb, wb_cb])
+        callbacks_list.extend([clear_cb, comet_cb, dvc_cb, mlflow_cb, neptune_cb, wb_cb])
 
     # Add the callbacks to the callbacks dictionary
     for callbacks in callbacks_list:
