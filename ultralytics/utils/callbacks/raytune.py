@@ -2,13 +2,23 @@
 
 from ultralytics.utils import SETTINGS
 
-try:
-    assert SETTINGS['raytune'] is True  # verify integration is enabled
-    import ray
-    from ray import tune
-    from ray.air import session
+# try:
+#     assert SETTINGS['raytune'] is True  # verify integration is enabled
+#     import ray
+#     from ray import tune
+#     from ray.air import session
 
-except (ImportError, AssertionError):
+# except (ImportError, AssertionError):
+#     tune = None
+
+try:
+    if SETTINGS.get('raytune', False):
+        import ray
+        from ray import tune
+        from ray.air import session
+    else:
+        tune = None
+except ImportError:
     tune = None
 
 
