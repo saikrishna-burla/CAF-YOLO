@@ -569,7 +569,7 @@ class BaseTrainer:
         """Performs final evaluation and validation for object detection YOLO model."""
         for f in self.last, self.best:
             if f.exists():
-                strip_optimizer(f)  # strip optimizers
+               # strip_optimizer(f)  # strip optimizers
                 if f is self.best:
                     LOGGER.info(f'\nValidating {f}...')
                     self.validator.args.plots = self.args.plots
