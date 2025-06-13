@@ -130,18 +130,20 @@ class SimpleClass:
     """
 
     def __str__(self):
-        """Return a human-readable string representation of the object."""
-        attr = []
-        for a in dir(self):
-            v = getattr(self, a)
-            if not callable(v) and not a.startswith('_'):
-                if isinstance(v, SimpleClass):
-                    # Display only the module and class name for subclasses
-                    s = f'{a}: {v.__module__}.{v.__class__.__name__} object'
+     """Return a human-readable string representation of the object."""
+     attr = []
+     for a in dir(self):
+        if not a.startswith('_'):
+            try:
+                v = getattr(self, a)
+            except AttributeError:
+                continue  # Skip any attribute that causes an error
+            if not callable(v):
+                if isinstance(v, (int, float, str, bool, list, dict, tuple)):
+                    attr.append(f"{a}={v}")
                 else:
-                    s = f'{a}: {repr(v)}'
-                attr.append(s)
-        return f'{self.__module__}.{self.__class__.__name__} object with attributes:\n\n' + '\n'.join(attr)
+                    attr.append(f"{a}={type(v).__name__}")
+     return f"{self.__class__.__name__}({', '.join(attr)})"
 
     def __repr__(self):
         """Return a machine-readable string representation of the object."""
